@@ -50,7 +50,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         paint = new Paint();
         paint.setColor(Color.GREEN);
 
-        cercle = new Cercle(screenWidth + 100, screenHeight + 1000, 55, 10);
+        cercle = new Cercle(screenWidth + 100, screenHeight + 1200, 55, 10);
         //cercle.setSpeed(20);
         // Set the SurfaceView object at the top of View object.
         setZOrderOnTop(true);
@@ -80,10 +80,10 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
     public boolean intersects(Cercle c, Brique b) {
         boolean intersects = false;
-        if (c.getX() + c.getDiametre() >= b.getRect().left &&
-                c.getX() - c.getDiametre() <= b.getRect().right &&
-                c.getY() + c.getDiametre() <= b.getRect().bottom &&
-                c.getY() - c.getDiametre() >= b.getRect().top) {
+        if (c.getX() + c.getDiametre() > b.getRect().left &&
+                c.getX() - c.getDiametre() < b.getRect().right &&
+                c.getY() - c.getDiametre() < b.getRect().bottom &&
+                c.getY() + c.getDiametre() > b.getRect().top) {
             intersects = true;
         }
 
@@ -102,6 +102,20 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
                 }
             }
         }
+
+        if (cercle.getX() < 0) {
+            cercle.reverseYVelocity();
+        }
+        if (cercle.getY() < 0) {
+            cercle.reverseYVelocity();
+        }
+        if (cercle.getX() > screenWidth) {
+            cercle.reverseYVelocity();
+        }
+        if (cercle.getY() > screenHeight) {
+            cercle.reverseYVelocity();
+        }
+
     }
 
     public void createBricksAndRestart() {

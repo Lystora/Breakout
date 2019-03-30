@@ -40,7 +40,7 @@ public class Cercle{
     }
     public void reverseYVelocity(){
         int y = getY();int x = getX();
-        setY(y=-y);
+        speed = -speed;
     }
     public void  move(SurfaceView pan) {
         int x = getX(); int y = getY();
