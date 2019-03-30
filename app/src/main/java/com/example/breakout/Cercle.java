@@ -38,7 +38,10 @@ public class Cercle{
         p.setColor(Color.RED);
         c.drawCircle(x, y, diametre, p);
     }
-
+    public void reverseYVelocity(){
+        int y = getY();int x = getX();
+        setY(y=-y);
+    }
     public void  move(SurfaceView pan) {
         int x = getX(); int y = getY();
         // Si la coordonnée x est inférieure à 1, on avance.
