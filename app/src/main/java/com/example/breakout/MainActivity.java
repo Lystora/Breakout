@@ -35,9 +35,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String Name = PlayerName.getText().toString();
                 SharedPreferences prefs = getSharedPreferences("PlayerNames", MODE_PRIVATE);
-                SharedPreferences.Editor editor = getSharedPreferences("PlayerNames", MODE_PRIVATE).edit();
+                SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("Name1", Name);
                 editor.apply();
+
                 Intent ScoreActivity = new Intent(MainActivity.this, Scoreboard.class);
                 startActivity(ScoreActivity);
 
