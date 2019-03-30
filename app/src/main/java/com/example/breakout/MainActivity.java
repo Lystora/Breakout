@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
         btPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent GameActivity = new Intent(MainActivity.this, GameActivity.class);
-                //startActivity(GameActivity);
+                Intent GameActivity = new Intent(MainActivity.this, GameActivity.class);
+                startActivity(GameActivity);
             }
         });
         btScore.setOnClickListener(new View.OnClickListener() {
