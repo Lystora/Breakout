@@ -104,13 +104,13 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         }
 
         if (cercle.getX() < 0) {
-            cercle.reverseYVelocity();
+            cercle.reverseXVelocity();
         }
         if (cercle.getY() < 0) {
             cercle.reverseYVelocity();
         }
         if (cercle.getX() > screenWidth) {
-            cercle.reverseYVelocity();
+            cercle.reverseXVelocity();
         }
         if (cercle.getY() > screenHeight) {
             cercle.reverseYVelocity();
