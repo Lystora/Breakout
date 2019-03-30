@@ -8,6 +8,8 @@ import android.view.SurfaceView;
 public class Cercle{
     int diametre,x,y;
     int speed = 0;
+    int Xspeed = 0;
+    int Yspeed = 0;
     private Color couleur;
     boolean backX = false;
     boolean backY = false;
@@ -17,13 +19,18 @@ public class Cercle{
         this.x = x;
         this.y = y;
         this.diametre = r/2;
-        this.speed = s;
+        this.Xspeed = s;
+        this.Yspeed = s;
     }
     public int getSpeed(){return speed;}
+    public int getXSpeed(){return Xspeed;}
+    public int getYSpeed(){return Yspeed;}
     public int getX() {return x;}
     public int getY() {return y;}
 
     public void setSpeed(int s){this.speed +=s;}
+    public void setXSpeed(int s){this.Xspeed +=s;}
+    public void setYSpeed(int s){this.Yspeed +=s;}
     public void setX(int x) {this.x = x;}
     public void setY(int y) {this.y = y;}
 
@@ -39,8 +46,10 @@ public class Cercle{
         c.drawCircle(x, y, diametre, p);
     }
     public void reverseYVelocity(){
-        int y = getY();int x = getX();
-        speed = -speed;
+        Yspeed = -Yspeed;
+    }
+    public void reverseXVelocity(){
+        Xspeed = -Xspeed;
     }
     public void  move(SurfaceView pan) {
         int x = getX(); int y = getY();
@@ -54,11 +63,11 @@ public class Cercle{
         if (y > pan.getHeight() - getDiametre()) backY = true;
 
         // Si on avance, on incrémente la coordonnée
-        if (!backX) {setX(x+=speed);}
-        else setX(x-=speed);
+        if (!backX) {setX(x+=Xspeed);}
+        else setX(x-=Xspeed);
 
         // Idem pour l'axe Y
-        if (!backY) {setY(y+=speed);}
-        else setY(y-=speed);
+        if (!backY) {setY(y+=Yspeed);}
+        else setY(y-=Yspeed);
     }
 }
