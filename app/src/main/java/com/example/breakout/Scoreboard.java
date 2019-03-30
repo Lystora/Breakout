@@ -21,7 +21,7 @@ public class Scoreboard extends AppCompatActivity {
     EditText PlayerName;
     List<String> PlayerList;
     int Value = 0;
-    SharedPreferences prefs, prefsName;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
