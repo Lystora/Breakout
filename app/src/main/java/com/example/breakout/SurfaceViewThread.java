@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -37,8 +38,6 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
     private int brickHeight;
 
-    private int distance, cercleDx, cercleDy;
-
     public SurfaceViewThread(Context context) {
         super(context);
         // Get SurfaceHolder object.
@@ -48,36 +47,30 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         surfaceHolder.addCallback(this);
 
         paint = new Paint();
-        paint.setColor(Color.GREEN);
 
-        cercle = new Cercle(screenWidth + 100, screenHeight + 1200, 55, 10);
-        //cercle.setSpeed(20);
-        // Set the SurfaceView object at the top of View object.
-        setZOrderOnTop(true);
+        //Initialisation de la balle
+        cercle = new Cercle(screenWidth + 100, screenHeight + 1200, 55, 25);
 
+        //Initialisation des briques
         createBricksAndRestart();
 
+        // Set the SurfaceView object at the top of View object.
+        setZOrderOnTop(true);
     }
 
     @Override
     public void run() {
         createBricksAndRestart();
         while (threadRunning) {
-
-            long startTime = System.currentTimeMillis();
-
-
             cercle.move(this);
             update();
             draw();
-
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ex) {
             }
         }
     }
-
     public boolean intersects(Cercle c, Brique b) {
         boolean intersects = false;
         if (c.getX() + c.getDiametre() > b.getRect().left &&
@@ -86,27 +79,26 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
                 c.getY() + c.getDiametre() > b.getRect().top) {
             intersects = true;
         }
-
         return intersects;
 
     }
 
     public void update() {
         // Check for ball colliding with a brick
-        for (int i = 0; i < nbBricks; i++) {
+       for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
                 if (intersects(cercle, bricks[i])) {
                     bricks[i].setInvisible();
                     cercle.reverseYVelocity();
-                    System.out.print("invisible");
+                    System.out.println(cercle.getX()+" "+cercle.getY()+" "+bricks[i].getRect().left+" "+bricks[i].getRect().right+" "+bricks[i].getRect().top+" "+bricks[i].getRect().bottom);
                 }
             }
         }
 
-        if (cercle.getX() < 0) {
+        if (cercle.getX() < 1 ) {
             cercle.reverseXVelocity();
         }
-        if (cercle.getY() < 0) {
+        if (cercle.getY() < 1 ) {
             cercle.reverseYVelocity();
         }
         if (cercle.getX() > screenWidth) {
@@ -119,15 +111,13 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     }
 
     public void createBricksAndRestart() {
-
         brickWidth = screenWidth / 8;
-
         brickHeight = screenHeight / 15;
 
         // Build a wall of bricks
         nbBricks = 0;
         for (int column = 0; column < 8; column++) {
-            for (int row = 0; row < 3; row++) {
+            for (int row = 0; row < 6; row++) {
                 bricks[nbBricks] = new Brique(column, row, brickWidth, brickHeight);
                 nbBricks++;
             }
