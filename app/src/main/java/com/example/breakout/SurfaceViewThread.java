@@ -101,7 +101,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     }
 
     public void update() {
-        paddle.update();
+        paddle.update(this);
 
         // Check for ball colliding with a brick
        for (int i = 0; i < nbBricks; i++) {
@@ -117,7 +117,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         if (intersectsP(cercle, paddle)) {
             cercle.setRandomXVelocity();
             cercle.reverseYVelocity();
-            //cercle.clearObstacleY((int)paddle.getRect().top - 2);
+            cercle.clearObstacleY((int)paddle.getRect().top - 2);
         }
         if (cercle.getX() < 1 ) {
             cercle.reverseXVelocity();

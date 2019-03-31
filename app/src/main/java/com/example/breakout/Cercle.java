@@ -24,11 +24,11 @@ public class Cercle{
         this.Xspeed = s;
         this.Yspeed = s;
     }
-    public int getSpeed(){return speed;}
-    public int getXSpeed(){return Xspeed;}
-    public int getYSpeed(){return Yspeed;}
-    public int getX() {return x;}
-    public int getY() {return y;}
+    public int getSpeed(){return this.speed;}
+    public int getXSpeed(){return this.Xspeed;}
+    public int getYSpeed(){return this.Yspeed;}
+    public int getX() {return this.x;}
+    public int getY() {return this.y;}
 
     public void setSpeed(int s){this.speed +=s;}
     public void setXSpeed(int s){this.Xspeed +=s;}
@@ -36,22 +36,20 @@ public class Cercle{
     public void setX(int x) {this.x = x;}
     public void setY(int y) {this.y = y;}
 
-    public int getDiametre() {return diametre;}
-    public Color getColor() {return couleur;}
+    public int getDiametre() {return this.diametre;}
+    public Color getColor() {return this.couleur;}
 
-    public void setDiametre(int r) {diametre = r;}
-    public void setColor(Color c) {couleur = c;}
+    public void setDiametre(int r) {this.diametre = r;}
+    public void setColor(Color c) {this.couleur = c;}
 
     public void draw(Canvas c) {
         Paint p = new Paint();
         p.setColor(Color.RED);
         c.drawCircle(x, y, diametre, p);
     }
-    public void reverseYVelocity(){
-        Yspeed = -Yspeed;
-    }
+    public void reverseYVelocity(){ this.Yspeed = -this.Yspeed;}
     public void reverseXVelocity(){
-        Xspeed = -Xspeed;
+        this.Xspeed = -this.Xspeed;
     }
 
     public void setRandomXVelocity(){
@@ -63,13 +61,9 @@ public class Cercle{
         }
     }
 
-    public void clearObstacleY(int y){
-        setY(y - getDiametre()*2);
-    }
+    public void clearObstacleY(int y){this.y = (y - getDiametre()*2);}
 
-    public void clearObstacleX(int x){
-        setX(x + getDiametre()*2);
-    }
+    public void clearObstacleX(int x){this.x = (x + getDiametre()*2);}
     public void  move(SurfaceView pan) {
         int x = getX(); int y = getY();
         // Si la coordonnée x est inférieure à 1, on avance.

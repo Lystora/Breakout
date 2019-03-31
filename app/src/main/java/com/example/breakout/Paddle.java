@@ -1,6 +1,7 @@
 package com.example.breakout;
 
 import android.graphics.RectF;
+import android.view.SurfaceView;
 
 public class Paddle {
     private RectF rect;
@@ -43,12 +44,12 @@ public class Paddle {
     // This update method will be called from update in BreakoutView
     // It determines if the paddle needs to move and changes the coordinates
     // contained in rect if necessary
-    public void update(){
-        if(paddleMoving == LEFT){
+    public void update(SurfaceView p){
+        if(paddleMoving == LEFT && x > 0){
             x = x - paddleSpeed;
         }
 
-        if(paddleMoving == RIGHT){
+        if(paddleMoving == RIGHT && x+length < p.getWidth()){
             x = x + paddleSpeed;
         }
 
