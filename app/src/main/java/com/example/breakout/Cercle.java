@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.SurfaceView;
 
+import java.util.Random;
+
 public class Cercle{
     int diametre,x,y;
     int speed = 0;
@@ -50,6 +52,23 @@ public class Cercle{
     }
     public void reverseXVelocity(){
         Xspeed = -Xspeed;
+    }
+
+    public void setRandomXVelocity(){
+        Random generator = new Random();
+        int answer = generator.nextInt(2);
+
+        if(answer == 0){
+            reverseXVelocity();
+        }
+    }
+
+    public void clearObstacleY(int y){
+        setY(y - getDiametre()*2);
+    }
+
+    public void clearObstacleX(int x){
+        setX(x + getDiametre()*2);
     }
     public void  move(SurfaceView pan) {
         int x = getX(); int y = getY();

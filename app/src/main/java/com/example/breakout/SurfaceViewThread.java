@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -38,6 +39,8 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
     private int brickHeight;
 
+    private Paddle paddle;
+
     public SurfaceViewThread(Context context) {
         super(context);
         // Get SurfaceHolder object.
@@ -48,6 +51,8 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
         paint = new Paint();
 
+        //Initialisation du paddle
+        paddle = new Paddle(screenWidth + 1200, screenHeight + 1800);
         //Initialisation de la balle
         cercle = new Cercle(screenWidth + 100, screenHeight + 1200, 55, 25);
 
@@ -73,10 +78,22 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     }
     public boolean intersects(Cercle c, Brique b) {
         boolean intersects = false;
-        if (c.getX() + c.getDiametre() > b.getRect().left &&
-                c.getX() - c.getDiametre() < b.getRect().right &&
-                c.getY() - c.getDiametre() < b.getRect().bottom &&
-                c.getY() + c.getDiametre() > b.getRect().top) {
+        if (c.getX() + c.getDiametre() > b.getRect().left-b.getPadding()&&
+                c.getX() - c.getDiametre() < b.getRect().right+b.getPadding()&&
+                c.getY() - c.getDiametre() < b.getRect().bottom+b.getPadding() &&
+                c.getY() + c.getDiametre() > b.getRect().top-b.getPadding() ) {
+            intersects = true;
+        }
+        return intersects;
+
+    }
+
+    public boolean intersectsP(Cercle c, Paddle P) {
+        boolean intersects = false;
+        if (c.getX() + c.getDiametre() > P.getRect().left &&
+                c.getX() - c.getDiametre() < P.getRect().right &&
+                c.getY() - c.getDiametre() < P.getRect().bottom &&
+                c.getY() + c.getDiametre() > P.getRect().top ) {
             intersects = true;
         }
         return intersects;
@@ -84,17 +101,24 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     }
 
     public void update() {
+        paddle.update();
+
         // Check for ball colliding with a brick
        for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
                 if (intersects(cercle, bricks[i])) {
                     bricks[i].setInvisible();
                     cercle.reverseYVelocity();
-                    System.out.println(cercle.getX()+" "+cercle.getY()+" "+bricks[i].getRect().left+" "+bricks[i].getRect().right+" "+bricks[i].getRect().top+" "+bricks[i].getRect().bottom);
+                    System.out.println(cercle.getX()+" "+cercle.getY()+" "+bricks[i].getRect().left+" "+bricks[i].getRect().right+" "+bricks[i].getRect().top+" "+bricks[i].getRect().bottom+"   "+cercle.getYSpeed());
                 }
             }
         }
-
+        // Check for ball colliding with paddle
+        if (intersectsP(cercle, paddle)) {
+            cercle.setRandomXVelocity();
+            cercle.reverseYVelocity();
+            //cercle.clearObstacleY((int)paddle.getRect().top - 2);
+        }
         if (cercle.getX() < 1 ) {
             cercle.reverseXVelocity();
         }
@@ -139,7 +163,11 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         background.setColor(Color.BLACK);
 
         canvas.drawRect(fond, background);
+        // Choose the brush color for drawing
+        paint.setColor(Color.argb(255, 255, 255, 255));
 
+        // Draw the paddle
+        canvas.drawRect(paddle.getRect(), paint);
 
         for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
@@ -152,7 +180,31 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Send message to main UI thread to update the drawing to the main view special area.
         surfaceHolder.unlockCanvasAndPost(canvas);
     }
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+            // Player has touched the screen
+            case MotionEvent.ACTION_DOWN:
+                if (motionEvent.getX() > screenWidth / 2) {
 
+                    paddle.setMovementState(paddle.RIGHT);
+                } else
+
+                {
+                    paddle.setMovementState(paddle.LEFT);
+                }
+
+                break;
+
+            // Player has removed finger from screen
+            case MotionEvent.ACTION_UP:
+
+                paddle.setMovementState(paddle.STOPPED);
+                break;
+        }
+
+        return true;
+    }
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         // Create the child thread when SurfaceView is created.
