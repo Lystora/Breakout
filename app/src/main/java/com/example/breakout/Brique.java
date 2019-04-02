@@ -1,6 +1,10 @@
 package com.example.breakout;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
+
+import static android.graphics.Color.argb;
 
 public class Brique {
 
@@ -8,6 +12,9 @@ public class Brique {
     private RectF rect;
     private boolean isVisible;
     private int padding = 5;
+    private int r = (int)(Math.random()*255);
+    private int v = (int)(Math.random()*255);
+    private int b = (int)(Math.random()*255);
 
     public Brique(int x, int y, int width, int height){
         this.x = x;
@@ -41,6 +48,13 @@ public class Brique {
     public void setVisibility(boolean v){this.isVisible = v;}
     public void setInvisible(){
         this.isVisible = false;
+    }
+
+    public void draw(Canvas c){
+        Paint p = new Paint();
+        int rgb = argb(255,r,v,b);
+        p.setColor(rgb);
+        c.drawRect(rect,p);
     }
 }
 

@@ -20,41 +20,40 @@ public class Paddle {
     private int paddleMoving = STOPPED;
 
     public Paddle(int screenX, int screenY){
-        length = 230;
-        height = 30;
+        this.length = 230;
+        this.height = 30;
 
         // Start paddle in roughly the screen centre
-        x = screenX / 2;
-        y = screenY - 20;
+        this.x = screenX /2;
+        this.y = screenY - 200;
 
-        rect = new RectF(x, y, x + length, y + height);
+        this.rect = new RectF(this.x, this.y, this.x + this.length, this.y + this.height);
 
-        paddleSpeed = 25;
+        this.paddleSpeed = 25;
     }
 
     public RectF getRect(){
-        return rect;
+        return this.rect;
     }
 
     // This method will be used to change/set if the paddle is going left, right or nowhere
     public void setMovementState(int state){
-        paddleMoving = state;
+        this.paddleMoving = state;
     }
 
-    // This update method will be called from update in BreakoutView
-    // It determines if the paddle needs to move and changes the coordinates
+    // This method determines if the paddle needs to move and changes the coordinates
     // contained in rect if necessary
     public void update(SurfaceView p){
-        if(paddleMoving == LEFT && x > 0){
-            x = x - paddleSpeed;
+        if(this.paddleMoving == this.LEFT && this.x > 0){
+            this.x = this.x - paddleSpeed;
         }
 
-        if(paddleMoving == RIGHT && x+length < p.getWidth()){
-            x = x + paddleSpeed;
+        if(this.paddleMoving == this.RIGHT && this.x + this.length < p.getWidth()){
+            this.x = this.x + this.paddleSpeed;
         }
 
-        rect.left = x;
-        rect.right = x + length;
+        this.rect.left = this.x;
+        this.rect.right = this.x + this.length;
     }
 
 }

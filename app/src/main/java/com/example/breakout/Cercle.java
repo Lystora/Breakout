@@ -18,8 +18,8 @@ public class Cercle{
 
     public Cercle(int x, int y, int r, int s) {
         super();
-        this.x = x;
-        this.y = y;
+        this.x = x/2;
+        this.y = y-200;
         this.diametre = r/2;
         this.Xspeed = s;
         this.Yspeed = s;

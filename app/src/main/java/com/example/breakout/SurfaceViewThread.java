@@ -5,12 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.util.ArrayList;
+import android.view.WindowManager;
+import android.widget.TextView;
 
 public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
@@ -41,10 +41,18 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
     private Paddle paddle;
 
+    private int score = 0;
+
     public SurfaceViewThread(Context context) {
         super(context);
+
         // Get SurfaceHolder object.
         surfaceHolder = this.getHolder();
+
+        //Get width and height screen
+        Display ecran = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        screenWidth= ecran.getWidth();
+        screenHeight= ecran.getHeight();
 
         // Add current object as the callback listener.
         surfaceHolder.addCallback(this);
@@ -52,30 +60,32 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         paint = new Paint();
 
         //Initialisation du paddle
-        paddle = new Paddle(screenWidth + 1200, screenHeight + 1800);
+        paddle = new Paddle(screenWidth, screenHeight);
         //Initialisation de la balle
-        cercle = new Cercle(screenWidth + 100, screenHeight + 1200, 55, 25);
+        cercle = new Cercle(screenWidth, screenHeight, 55, 15);
 
         //Initialisation des briques
         createBricksAndRestart();
 
         // Set the SurfaceView object at the top of View object.
         setZOrderOnTop(true);
+
     }
 
     @Override
     public void run() {
+
         createBricksAndRestart();
-        while (threadRunning) {
-            cercle.move(this);
+
+        while(threadRunning) {
             update();
             draw();
             try {
                 Thread.sleep(1);
-            } catch (InterruptedException ex) {
-            }
+            }catch (InterruptedException ex) {}
         }
     }
+
     public boolean intersects(Cercle c, Brique b) {
         boolean intersects = false;
         if (c.getX() + c.getDiametre() > b.getRect().left-b.getPadding()&&
@@ -97,28 +107,32 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
             intersects = true;
         }
         return intersects;
-
     }
 
     public void update() {
+
+        //Initialisation de la raquette et de la balle
         paddle.update(this);
+        cercle.move(this);
 
         // Check for ball colliding with a brick
        for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
                 if (intersects(cercle, bricks[i])) {
                     bricks[i].setInvisible();
+                    score+=1;
                     cercle.reverseYVelocity();
-                    System.out.println(cercle.getX()+" "+cercle.getY()+" "+bricks[i].getRect().left+" "+bricks[i].getRect().right+" "+bricks[i].getRect().top+" "+bricks[i].getRect().bottom+"   "+cercle.getYSpeed());
                 }
             }
         }
+
         // Check for ball colliding with paddle
         if (intersectsP(cercle, paddle)) {
             cercle.setRandomXVelocity();
             cercle.reverseYVelocity();
             cercle.clearObstacleY((int)paddle.getRect().top - 2);
         }
+
         if (cercle.getX() < 1 ) {
             cercle.reverseXVelocity();
         }
@@ -131,7 +145,6 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         if (cercle.getY() > screenHeight) {
             cercle.reverseYVelocity();
         }
-
     }
 
     public void createBricksAndRestart() {
@@ -161,8 +174,8 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Draw the specify canvas background color.
         Paint background = new Paint();
         background.setColor(Color.BLACK);
-
         canvas.drawRect(fond, background);
+
         // Choose the brush color for drawing
         paint.setColor(Color.argb(255, 255, 255, 255));
 
@@ -171,8 +184,9 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
         for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
-                paint.setColor(Color.WHITE);
-                canvas.drawRect(bricks[i].getRect(), paint);
+               /* paint.setColor(Color.WHITE);
+                canvas.drawRect(bricks[i].getRect(), paint);*/
+                bricks[i].draw(canvas);
             }
         }
         cercle.draw(canvas);
@@ -180,37 +194,36 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Send message to main UI thread to update the drawing to the main view special area.
         surfaceHolder.unlockCanvasAndPost(canvas);
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
+
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             // Player has touched the screen
             case MotionEvent.ACTION_DOWN:
                 if (motionEvent.getX() > screenWidth / 2) {
-
                     paddle.setMovementState(paddle.RIGHT);
-                } else
-
-                {
+                }else{
                     paddle.setMovementState(paddle.LEFT);
                 }
-
                 break;
-
             // Player has removed finger from screen
             case MotionEvent.ACTION_UP:
-
                 paddle.setMovementState(paddle.STOPPED);
                 break;
         }
-
         return true;
     }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+
         // Create the child thread when SurfaceView is created.
         thread = new Thread(this);
+
         // Start to run the child thread.
         thread.start();
+
         // Set thread running flag to true.
         threadRunning = true;
 
