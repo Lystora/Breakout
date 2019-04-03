@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,7 +17,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
     private SurfaceHolder surfaceHolder = null;
 
-    private Paint paint = null;
+    private Paint paint = new Paint();
 
     private Thread thread = null;
 
@@ -49,41 +50,22 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Get SurfaceHolder object.
         surfaceHolder = this.getHolder();
 
+        // Add current object as the callback listener.
+        surfaceHolder.addCallback(this);
+
         //Get width and height screen
         Display ecran = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         screenWidth= ecran.getWidth();
         screenHeight= ecran.getHeight();
 
-        // Add current object as the callback listener.
-        surfaceHolder.addCallback(this);
-
-        paint = new Paint();
-
-        //Initialisation du paddle
+        //Initialisation paddle, balle, briques
         paddle = new Paddle(screenWidth, screenHeight);
-        //Initialisation de la balle
         cercle = new Cercle(screenWidth, screenHeight, 55, 15);
-
-        //Initialisation des briques
         createBricksAndRestart();
 
         // Set the SurfaceView object at the top of View object.
         setZOrderOnTop(true);
 
-    }
-
-    @Override
-    public void run() {
-
-        createBricksAndRestart();
-
-        while(threadRunning) {
-            update();
-            draw();
-            try {
-                Thread.sleep(1);
-            }catch (InterruptedException ex) {}
-        }
     }
 
     public boolean intersects(Cercle c, Brique b) {
@@ -119,13 +101,18 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
        for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
                 if (intersects(cercle, bricks[i])) {
-                    bricks[i].setInvisible();
-                    score+=1;
-                    cercle.reverseYVelocity();
+                    if(bricks[i].getRes() > 0) {
+                        bricks[i].setRes();
+                        cercle.reverseYVelocity();
+                    }else{
+                        bricks[i].setInvisible();
+                        bricks[i].setRes();
+                        cercle.reverseYVelocity();
+                        score+=1;
+                    }
                 }
             }
         }
-
         // Check for ball colliding with paddle
         if (intersectsP(cercle, paddle)) {
             cercle.setRandomXVelocity();
@@ -161,8 +148,21 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         }
     }
 
+    @Override
+    public void run() {
+
+        createBricksAndRestart();
+
+        while(threadRunning) {
+            update();
+            draw();
+            try {
+                Thread.sleep(1);
+            }catch (InterruptedException ex) {}
+        }
+    }
+
     private void draw() {
-        int margin = 10000;
         int left = 0;
         int top = 0;
         int right = screenWidth;
@@ -182,13 +182,14 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Draw the paddle
         canvas.drawRect(paddle.getRect(), paint);
 
+        // Draw the bricks
         for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
-               /* paint.setColor(Color.WHITE);
-                canvas.drawRect(bricks[i].getRect(), paint);*/
                 bricks[i].draw(canvas);
             }
         }
+
+        // Draw the ball
         cercle.draw(canvas);
 
         // Send message to main UI thread to update the drawing to the main view special area.
