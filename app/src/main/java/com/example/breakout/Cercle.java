@@ -3,12 +3,11 @@ package com.example.breakout;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.view.SurfaceView;
 
 import java.util.Random;
 
 public class Cercle{
-    int diametre,x,y;
+    int rayon,x,y;
     int speed = 0;
     int Xspeed = 0;
     int Yspeed = 0;
@@ -20,7 +19,7 @@ public class Cercle{
         super();
         this.x = x/2;
         this.y = y-200;
-        this.diametre = r/2;
+        this.rayon = r/2;
         this.Xspeed = s;
         this.Yspeed = s;
     }
@@ -36,16 +35,16 @@ public class Cercle{
     public void setX(int x) {this.x = x;}
     public void setY(int y) {this.y = y;}
 
-    public int getDiametre() {return this.diametre;}
+    public int getRayon() {return this.rayon;}
     public Color getColor() {return this.couleur;}
 
-    public void setDiametre(int r) {this.diametre = r;}
+    public void setRayon(int r) {this.rayon = r;}
     public void setColor(Color c) {this.couleur = c;}
 
     public void draw(Canvas c) {
         Paint p = new Paint();
         p.setColor(Color.RED);
-        c.drawCircle(x, y, diametre, p);
+        c.drawCircle(x, y, rayon, p);
     }
     public void reverseYVelocity(){ this.Yspeed = -this.Yspeed;}
     public void reverseXVelocity(){
@@ -61,26 +60,38 @@ public class Cercle{
         }
     }
 
-    public void clearObstacleY(int y){this.y = (y - getDiametre()*2);}
+    public void clearObstacleY(int y){this.y = (y - getRayon()*2);}
 
-    public void clearObstacleX(int x){this.x = (x + getDiametre()*2);}
-    public void  move(SurfaceView pan) {
+    public void clearObstacleX(int x){this.x = (x + getRayon()*2);}
+
+    public void  reverse(int w, int h, int vie, boolean paused) {
         int x = getX(); int y = getY();
-        // Si la coordonnée x est inférieure à 1, on avance.
-        // Si la coordonnée x est supérieure à la taille du Panneau moins la taille du rond, on recule
-        if (x < 1+getDiametre()) backX = false;
-        if (x > pan.getWidth() - getDiametre()) backX = true;
 
-        // Idem pour l'axe y
-        if (y < 1+getDiametre()) backY = false;
-        if (y > pan.getHeight() - getDiametre()) backY = true;
+        if (x + this.Xspeed < this.rayon ) {
+            reverseXVelocity();
+        }
+        if (y + this.Yspeed < this.rayon) {
+            reverseYVelocity();
+        }
+        if (x + this.Xspeed > (w - getRayon())) {
+            reverseXVelocity();
+        }
+        if (y + this.Yspeed > (h - getRayon())) {
+            reverseYVelocity();
+            vie--;
+            if (vie == 0) {
+                paused = true;
+            }
+        }
+    }
 
-        // Si on avance, on incrémente la coordonnée
-        if (!backX) {setX(x+=Xspeed);}
-        else setX(x-=Xspeed);
+    public void move(long fps){
+        this.x += (Xspeed / fps);
+        this.y += (Yspeed / fps);
+    }
 
-        // Idem pour l'axe Y
-        if (!backY) {setY(y+=Yspeed);}
-        else setY(y-=Yspeed);
+    public void reset(int x, int y){
+        this.x = x / 2;
+        this.y = y - 200;
     }
 }

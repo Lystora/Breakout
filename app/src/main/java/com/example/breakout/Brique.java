@@ -5,8 +5,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import static android.graphics.Color.argb;
-
 public class Brique {
 
     private int x,y,width,height,resistance;

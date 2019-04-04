@@ -5,45 +5,44 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
     private SurfaceHolder surfaceHolder = null;
 
-    private Paint paint = new Paint();
-
     private Thread thread = null;
 
-    // Record whether the child thread is running or not.
-    private boolean threadRunning = false;
+    private Paint paint = new Paint();
 
     private Canvas canvas = null;
 
-    private int screenWidth = 0;
-
-    private int screenHeight = 0;
-
     private Cercle cercle;
-
-    private Brique[] bricks = new Brique[200];
-
-    private int nbBricks = 0;
-
-    private int brickWidth;
-
-    private int brickHeight;
 
     private Paddle paddle;
 
-    private int score = 0;
-    private int CdistX,CdistY,nearestX,nearestY,CornerDist1,CornerDist2;
+    private Brique[] bricks = new Brique[200];
+
+    private int nbBricks, brickWidth, brickHeight, screenWidth, screenHeight;
+
+    private int CdistX, CdistY, nearestX, nearestY;
+
+    private int fps = 1;
+
+    private boolean threadRunning = false;
+
+    boolean paused = true;
+
+    volatile boolean playing;
+
+    int score = 0;
+
+    int lives = 3;
 
     public SurfaceViewThread(Context context) {
         super(context);
@@ -66,50 +65,37 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
         // Set the SurfaceView object at the top of View object.
         setZOrderOnTop(true);
-
     }
-    public boolean inter(Cercle c,Brique b){
-        nearestX = (int)Math.max(b.getRect().left,Math.min(c.getX(),b.getRect().left + b.getWidth() - b.getPadding()));
-        nearestY = (int)Math.max(b.getRect().top,Math.min(c.getY(),b.getRect().top + b.getHeight() - b.getPadding()));
+
+    public boolean collisionBrique(Cercle c,Brique b){
+        nearestX = (int)Math.max(b.getRect().left,Math.min(c.getX(),b.getRect().right));
+        nearestY = (int)Math.max(b.getRect().top,Math.min(c.getY(),b.getRect().bottom));
 
         CdistX = c.getX() - nearestX;
         CdistY = c.getY() - nearestY;
 
-        return(CdistX * CdistX + CdistY * CdistY) < (c.getDiametre() * c.getDiametre());
-    }
-    public boolean intersects(Cercle c, Brique b) {
-        boolean intersects = false;
-        if (c.getX() + c.getDiametre() > b.getRect().left&&
-                c.getX() - c.getDiametre() < b.getRect().right&&
-                c.getY() - c.getDiametre() < b.getRect().bottom &&
-                c.getY() + c.getDiametre() > b.getRect().top ) {
-            intersects = true;
-        }
-        return intersects;
-
+        return(CdistX * CdistX + CdistY * CdistY) < (c.getRayon() * c.getRayon());
     }
 
-    public boolean intersectsP(Cercle c, Paddle P) {
-        boolean intersects = false;
-        if (c.getX() + c.getDiametre() > P.getRect().left &&
-                c.getX() - c.getDiametre() < P.getRect().right &&
-                c.getY() - c.getDiametre() < P.getRect().bottom &&
-                c.getY() + c.getDiametre() > P.getRect().top ) {
-            intersects = true;
-        }
-        return intersects;
+    public boolean collisionPaddle(Cercle c,Paddle p){
+        nearestX = (int)Math.max(p.getRect().left,Math.min(c.getX(),p.getRect().right));
+        nearestY = (int)Math.max(p.getRect().top,Math.min(c.getY(),p.getRect().bottom));
+
+        CdistX = c.getX() - nearestX;
+        CdistY = c.getY() - nearestY;
+
+        return(CdistX * CdistX + CdistY * CdistY) < (c.getRayon() * c.getRayon());
     }
 
     public void update() {
-
         //Initialisation de la raquette et de la balle
-        paddle.update(this);
-        cercle.move(this);
+        paddle.update(screenWidth);
+        cercle.move(fps);
 
         // Check for ball colliding with a brick
-       for (int i = 0; i < nbBricks; i++) {
+        for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
-                if (/*intersects(cercle, bricks[i])*/inter(cercle,bricks[i])) {
+                if (collisionBrique(cercle,bricks[i])) {
                     if(bricks[i].getRes() > 0) {
                         bricks[i].setRes();
                         cercle.reverseYVelocity();
@@ -123,23 +109,29 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
             }
         }
         // Check for ball colliding with paddle
-        if (intersectsP(cercle, paddle)) {
+        if (collisionPaddle(cercle, paddle)) {
             cercle.setRandomXVelocity();
             cercle.reverseYVelocity();
             cercle.clearObstacleY((int)paddle.getRect().top - 2);
         }
 
-        if (cercle.getX() < 1 ) {
+        //Check for ball colliding with screen
+        if (cercle.getX() + cercle.getXSpeed() < cercle.getRayon() ) {
             cercle.reverseXVelocity();
         }
-        if (cercle.getY() < 1 ) {
+        if (cercle.getY() + cercle.getYSpeed() < cercle.getRayon()) {
             cercle.reverseYVelocity();
         }
-        if (cercle.getX() > screenWidth) {
+        if (cercle.getX() + cercle.getXSpeed() > (screenWidth - cercle.getRayon())) {
             cercle.reverseXVelocity();
         }
-        if (cercle.getY() > screenHeight) {
+        if (cercle.getY() + cercle.getYSpeed() > (screenHeight- cercle.getRayon())) {
             cercle.reverseYVelocity();
+            lives--;
+            if (lives == 0) {
+                paused = true;
+                createBricksAndRestart();
+            }
         }
     }
 
@@ -147,6 +139,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         brickWidth = screenWidth / 8;
         brickHeight = screenHeight / 15;
 
+        cercle.reset(screenWidth, screenHeight);
         // Build a wall of bricks
         nbBricks = 0;
         for (int column = 0; column < 8; column++) {
@@ -155,18 +148,25 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
                 nbBricks++;
             }
         }
+        // Restart game
+        if (lives == 0) {
+            score = 0;
+            lives = 3;
+        }
     }
 
     @Override
     public void run() {
-
+        //Initialisation des briques
         createBricksAndRestart();
 
         while(threadRunning) {
-            update();
+            if (!paused) {
+                update();
+            }
             draw();
             try {
-                Thread.sleep(1);
+                Thread.sleep(fps);
             }catch (InterruptedException ex) {}
         }
     }
@@ -178,31 +178,33 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         int bottom = screenHeight;
         Rect fond = new Rect(left, top, right, bottom);
 
-        canvas = surfaceHolder.lockCanvas();
+        if(surfaceHolder.getSurface().isValid()) {
+            canvas = surfaceHolder.lockCanvas();
 
-        // Draw the specify canvas background color.
-        Paint background = new Paint();
-        background.setColor(Color.BLACK);
-        canvas.drawRect(fond, background);
+            // Draw the specify canvas background color.
+            Paint background = new Paint();
+            background.setColor(Color.BLACK);
+            canvas.drawRect(fond, background);
 
-        // Choose the brush color for drawing
-        paint.setColor(Color.argb(255, 255, 255, 255));
+            // Choose the brush color for drawing
+            paint.setColor(Color.argb(255, 255, 255, 255));
 
-        // Draw the paddle
-        canvas.drawRect(paddle.getRect(), paint);
+            // Draw the paddle
+            canvas.drawRect(paddle.getRect(), paint);
 
-        // Draw the bricks
-        for (int i = 0; i < nbBricks; i++) {
-            if (bricks[i].getVisibility()) {
-                bricks[i].draw(canvas);
+            // Draw the bricks
+            for (int i = 0; i < nbBricks; i++) {
+                if (bricks[i].getVisibility()) {
+                    bricks[i].draw(canvas);
+                }
             }
+
+            // Draw the ball
+            cercle.draw(canvas);
+
+            // Send message to main UI thread to update the drawing to the main view special area.
+            surfaceHolder.unlockCanvasAndPost(canvas);
         }
-
-        // Draw the ball
-        cercle.draw(canvas);
-
-        // Send message to main UI thread to update the drawing to the main view special area.
-        surfaceHolder.unlockCanvasAndPost(canvas);
     }
 
     @Override
@@ -211,6 +213,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             // Player has touched the screen
             case MotionEvent.ACTION_DOWN:
+                paused = false;
                 if (motionEvent.getX() > screenWidth / 2) {
                     paddle.setMovementState(paddle.RIGHT);
                 }else{
@@ -225,9 +228,16 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         return true;
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void pause() {
+        threadRunning = false;
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Log.e("Error:", "joining thread");
+        }
+    }
 
+    public void start() {
         // Create the child thread when SurfaceView is created.
         thread = new Thread(this);
 
@@ -237,9 +247,14 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Set thread running flag to true.
         threadRunning = true;
 
-        // Get screen width and height.
         screenHeight = getHeight();
         screenWidth = getWidth();
+    }
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        start();
+        // Get screen width and height.
+
     }
 
     @Override
@@ -251,6 +266,6 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     public void surfaceDestroyed(SurfaceHolder holder) {
         // Set thread running flag to false when Surface is destroyed.
         // Then the thread will jump out the while loop and complete.
-        threadRunning = false;
+        pause();
     }
 }
