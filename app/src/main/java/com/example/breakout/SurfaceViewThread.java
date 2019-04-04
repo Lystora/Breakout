@@ -43,6 +43,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     private Paddle paddle;
 
     private int score = 0;
+    private int CdistX,CdistY,nearestX,nearestY,CornerDist1,CornerDist2;
 
     public SurfaceViewThread(Context context) {
         super(context);
@@ -67,13 +68,21 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         setZOrderOnTop(true);
 
     }
+    public boolean inter(Cercle c,Brique b){
+        nearestX = (int)Math.max(b.getRect().left,Math.min(c.getX(),b.getRect().left + b.getWidth() - b.getPadding()));
+        nearestY = (int)Math.max(b.getRect().top,Math.min(c.getY(),b.getRect().top + b.getHeight() - b.getPadding()));
 
+        CdistX = c.getX() - nearestX;
+        CdistY = c.getY() - nearestY;
+
+        return(CdistX * CdistX + CdistY * CdistY) < (c.getDiametre() * c.getDiametre());
+    }
     public boolean intersects(Cercle c, Brique b) {
         boolean intersects = false;
-        if (c.getX() + c.getDiametre() > b.getRect().left-b.getPadding()&&
-                c.getX() - c.getDiametre() < b.getRect().right+b.getPadding()&&
-                c.getY() - c.getDiametre() < b.getRect().bottom+b.getPadding() &&
-                c.getY() + c.getDiametre() > b.getRect().top-b.getPadding() ) {
+        if (c.getX() + c.getDiametre() > b.getRect().left&&
+                c.getX() - c.getDiametre() < b.getRect().right&&
+                c.getY() - c.getDiametre() < b.getRect().bottom &&
+                c.getY() + c.getDiametre() > b.getRect().top ) {
             intersects = true;
         }
         return intersects;
@@ -100,7 +109,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Check for ball colliding with a brick
        for (int i = 0; i < nbBricks; i++) {
             if (bricks[i].getVisibility()) {
-                if (intersects(cercle, bricks[i])) {
+                if (/*intersects(cercle, bricks[i])*/inter(cercle,bricks[i])) {
                     if(bricks[i].getRes() > 0) {
                         bricks[i].setRes();
                         cercle.reverseYVelocity();

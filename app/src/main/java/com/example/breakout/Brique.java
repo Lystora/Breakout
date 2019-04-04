@@ -1,6 +1,7 @@
 package com.example.breakout;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
@@ -21,7 +22,7 @@ public class Brique {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.resistance = 5;
+        this.resistance = 2;
 
         this.rect = new RectF(this.x * this.width + padding,
                 this.y * this.height + padding,
@@ -55,8 +56,10 @@ public class Brique {
 
     public void draw(Canvas c){
         Paint p = new Paint();
-        int rgb = argb(255,r,v,b);
-        p.setColor(rgb);
+        //int rgb = argb(255,r,v,b);
+        if(this.resistance == 2) p.setColor(Color.GREEN);
+        else if(this.resistance == 1) p.setColor(Color.YELLOW);
+        else p.setColor(Color.RED);
         c.drawRect(rect,p);
     }
 }
