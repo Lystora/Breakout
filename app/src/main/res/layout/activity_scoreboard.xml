@@ -29,10 +29,10 @@
             android:text="Score = 0"
             android:textSize="30dp"/>
         <Button
-            android:id="@+id/activity_score_save"
+            android:id="@+id/activity_score_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"/>
+            android:text="Refresh"/>
     </LinearLayout>
     <EditText
         android:id="@+id/activity_score_playername"
@@ -41,6 +41,11 @@
         android:ems="10"
         android:inputType="text"
         android:hint="Enter Your Name Here" />
+    <Button
+        android:id="@+id/activity_score_saveall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SAVEALL"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

@@ -14,22 +14,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Scoreboard extends AppCompatActivity {
-    Button Minus, Plus, SaveButton;
+    Button Minus, Plus, RefreshButton, SAVEALL;
     TextView ScoreText, ScoreBoard;
     EditText PlayerName;
     List<String> PlayerList;
     int Value = 0;
-    SharedPreferences prefs;
+    SharedPreferences prefs, prefsPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scoreboard);
         PlayerList = new ArrayList<String>();
+        RecupList();
         //Config des Widgets
         Minus = (Button) findViewById(R.id.activity_score_minus);
         Plus = (Button) findViewById(R.id.activity_score_plus);
-        SaveButton = (Button) findViewById(R.id.activity_score_save);
+        RefreshButton = (Button) findViewById(R.id.activity_score_refresh);
+        SAVEALL = (Button) findViewById(R.id.activity_score_saveall);
         ScoreText = (TextView) findViewById(R.id.activity_score_score);
         ScoreBoard = (TextView) findViewById(R.id.activity_score_scoreboard);
         PlayerName = (EditText) findViewById(R.id.activity_score_playername);
@@ -50,7 +52,7 @@ public class Scoreboard extends AppCompatActivity {
         });
 
         //Sauvegarde du score actuel
-        SaveButton.setOnClickListener(new View.OnClickListener() {
+        RefreshButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
@@ -59,16 +61,23 @@ public class Scoreboard extends AppCompatActivity {
                 editor.putInt(PlayerName.getText().toString(), Value);
                 editor.apply();
 
-
-                if(PlayerList.size()==5){
-                    addPlayer(PlayerName.getText().toString());
-                    SortList();
-                    removePlayer();
-                }else{
-                    addPlayer(PlayerName.getText().toString());
-                    SortList();
+                if(!PlayerName.getText().toString().isEmpty()){
+                    if(PlayerList.size()==5){
+                        addPlayer(PlayerName.getText().toString());
+                        SortList();
+                        removePlayer();
+                    }else{
+                        addPlayer(PlayerName.getText().toString());
+                        SortList();
+                    }
                 }
                 DisplayScore();
+            }
+        });
+        SAVEALL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SaveList();
             }
         });
 
@@ -112,5 +121,24 @@ public class Scoreboard extends AppCompatActivity {
             chaine += c;
         }
         ScoreBoard.setText(chaine);
+    }
+    public void SaveList(){
+        prefsPlayer = getSharedPreferences("PlayerNames", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefsPlayer.edit();
+        for(int i=0; i<PlayerList.size(); i++){
+            String key ="best"+Integer.toString(i+1);
+            editor.putString(key, PlayerList.get(i));
+            editor.apply();
+        }
+    }
+    public void RecupList(){
+        prefsPlayer = getSharedPreferences("PlayerNames", MODE_PRIVATE);
+        for(int i=0; i<5; i++){
+            String key = "best"+Integer.toString(i+1);
+            String Player = prefsPlayer.getString(key, "no player");
+            //if(!Player.isEmpty()) {
+                PlayerList.add(Player);
+            //}
+        }
     }
 }
