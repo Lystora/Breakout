@@ -119,7 +119,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         if (cercle.getX() + cercle.getXSpeed() < cercle.getRayon() ) {
             cercle.reverseXVelocity();
         }
-        if (cercle.getY() + cercle.getYSpeed() < cercle.getRayon()) {
+        if (cercle.getY() + cercle.getYSpeed() < brickHeight*2) {
             cercle.reverseYVelocity();
         }
         if (cercle.getX() + cercle.getXSpeed() > (screenWidth - cercle.getRayon())) {
@@ -143,7 +143,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         // Build a wall of bricks
         nbBricks = 0;
         for (int column = 0; column < 8; column++) {
-            for (int row = 0; row < 6; row++) {
+            for (int row = 2; row < 6; row++) {
                 bricks[nbBricks] = new Brique(column, row, brickWidth, brickHeight);
                 nbBricks++;
             }
@@ -188,8 +188,25 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
 
             // Choose the brush color for drawing
             paint.setColor(Color.argb(255, 255, 255, 255));
+            paint.setTextSize(160);
+
+            // Draw the score
+            if(score < 10){
+                canvas.drawText(String.valueOf("0"+score), (int)(screenWidth / 2.4), screenHeight / 10, paint);
+            }else canvas.drawText(String.valueOf(score), (int)(screenWidth / 2.4), screenHeight / 10, paint);
+
+            // Draw life
+            if(lives == 1){
+                paint.setTextSize(90);
+                paint.setColor(Color.RED);
+                canvas.drawText(String.valueOf(lives), screenWidth - 150, screenHeight / 11, paint);
+            }else{
+                paint.setTextSize(90);
+                canvas.drawText(String.valueOf(lives), screenWidth - 150, screenHeight / 11, paint);
+            }
 
             // Draw the paddle
+            paint.setColor(Color.WHITE);
             canvas.drawRect(paddle.getRect(), paint);
 
             // Draw the bricks

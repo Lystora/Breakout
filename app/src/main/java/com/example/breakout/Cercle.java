@@ -11,10 +11,11 @@ public class Cercle{
     int speed = 0;
     int Xspeed = 0;
     int Yspeed = 0;
+    int BHeight = 0;
     private Color couleur;
     boolean backX = false;
     boolean backY = false;
-
+    Brique b;
     public Cercle(int x, int y, int r, int s) {
         super();
         this.x = x/2;
@@ -64,26 +65,8 @@ public class Cercle{
 
     public void clearObstacleX(int x){this.x = (x + getRayon()*2);}
 
-    public void  reverse(int w, int h, int vie, boolean paused) {
-        int x = getX(); int y = getY();
-
-        if (x + this.Xspeed < this.rayon ) {
-            reverseXVelocity();
-        }
-        if (y + this.Yspeed < this.rayon) {
-            reverseYVelocity();
-        }
-        if (x + this.Xspeed > (w - getRayon())) {
-            reverseXVelocity();
-        }
-        if (y + this.Yspeed > (h - getRayon())) {
-            reverseYVelocity();
-            vie--;
-            if (vie == 0) {
-                paused = true;
-            }
-        }
-    }
+    public void setBHeight(int b){this.BHeight = b;}
+    public int getBHeight(){return this.BHeight;}
 
     public void move(long fps){
         this.x += (Xspeed / fps);

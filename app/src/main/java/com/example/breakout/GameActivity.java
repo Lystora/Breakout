@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 public class GameActivity extends AppCompatActivity {
     SurfaceViewThread surfaceViewThread;
-    TextView drawScore;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,8 +24,6 @@ public class GameActivity extends AppCompatActivity {
 
         // Get text drawing LinearLayout canvas.
         LinearLayout drawCanvas = (LinearLayout)findViewById(R.id.drawCanvas);
-        drawScore = (TextView)findViewById(R.id.drawScore);
-        drawScore.setText(String.valueOf("Score: "));
         // Add surfaceview object to the LinearLayout object.
         drawCanvas.addView(surfaceViewThread);
     }
