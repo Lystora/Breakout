@@ -1,6 +1,8 @@
 package com.example.breakout;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,6 +30,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
     boolean paused = true;
     int score = 0;
     int lives = 3;
+    SharedPreferences pref;
 
     //|-----------------------|//
     // CONSTRUCTEUR DE LA VIEW //
@@ -180,8 +183,14 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         }
         // Restart game
         if (lives == 0) {
+            pref = getContext().getSharedPreferences("PlayerScore", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("LatestScore", score);
+            editor.apply();
             score = 0;
             lives = 3;
+            Intent ScoreActivity = new Intent(getContext(), Scoreboard.class);
+            getContext().startActivity(ScoreActivity);
         }
     }
 

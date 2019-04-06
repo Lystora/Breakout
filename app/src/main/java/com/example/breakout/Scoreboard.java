@@ -1,8 +1,6 @@
 package com.example.breakout;
 
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,56 +8,46 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class Scoreboard extends AppCompatActivity {
-    Button Minus, Plus, RefreshButton, SAVEALL;
-    TextView ScoreText, ScoreBoard;
+    Button AddScoreButton, SAVEALL;
+    TextView ScoreBoard;
     EditText PlayerName;
     List<String> PlayerList;
-    int Value = 0;
-    SharedPreferences prefs, prefsPlayer;
+    String currentDate;
+    SharedPreferences prefs, prefsPlayer, prefsDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scoreboard);
         PlayerList = new ArrayList<String>();
+        prefs = getSharedPreferences("PlayerScore", MODE_PRIVATE);
+        prefsPlayer = getSharedPreferences("PlayerNames", MODE_PRIVATE);
         RecupList();
+        Calendar calendar = Calendar.getInstance();
+        currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         //Config des Widgets
-        Minus = (Button) findViewById(R.id.activity_score_minus);
-        Plus = (Button) findViewById(R.id.activity_score_plus);
-        RefreshButton = (Button) findViewById(R.id.activity_score_refresh);
+        AddScoreButton = (Button) findViewById(R.id.activity_score_addScore);
         SAVEALL = (Button) findViewById(R.id.activity_score_saveall);
-        ScoreText = (TextView) findViewById(R.id.activity_score_score);
         ScoreBoard = (TextView) findViewById(R.id.activity_score_scoreboard);
         PlayerName = (EditText) findViewById(R.id.activity_score_playername);
-        //Incrémentation du score manuelle pour TESTER
-        Minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(Value>0)Value--;
-                ScoreText.setText("Score : " + Value);
-            }
-        });
-        Plus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Value++;
-                ScoreText.setText("Score : " + Value);
-            }
-        });
-
         //Sauvegarde du score actuel
-        RefreshButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        AddScoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 prefs = getSharedPreferences("PlayerScore", MODE_PRIVATE);
+                prefsDate = getSharedPreferences("ScoreDate", MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt(PlayerName.getText().toString(), Value);
-                editor.apply();
+                SharedPreferences.Editor date_editor = prefsDate.edit();
+                int LatestScore = prefs.getInt("LatestScore", 0);
+                editor.putInt(PlayerName.getText().toString(), LatestScore);
+                date_editor.putString(PlayerName.getText().toString(), currentDate);
+                editor.apply();date_editor.apply();
 
                 if(!PlayerName.getText().toString().isEmpty()){
                     if(PlayerList.size()==5){
@@ -116,7 +104,7 @@ public class Scoreboard extends AppCompatActivity {
             if(PlayerList.get(i).isEmpty()){
                 c = "---"+"\n";
             }else{
-                c = PlayerList.get(i)+ "         "+prefs.getInt(PlayerList.get(i), 0)+"\n";
+                c = PlayerList.get(i)+ "       "+prefsDate.getString(PlayerList.get(i), "no_date")+"       "+prefs.getInt(PlayerList.get(i), 0)+"\n";
             }
             chaine += c;
         }
@@ -135,10 +123,17 @@ public class Scoreboard extends AppCompatActivity {
         prefsPlayer = getSharedPreferences("PlayerNames", MODE_PRIVATE);
         for(int i=0; i<5; i++){
             String key = "best"+Integer.toString(i+1);
-            String Player = prefsPlayer.getString(key, "no player");
-            //if(!Player.isEmpty()) {
+            String Player = prefsPlayer.getString(key, "");
+            if(!Player.isEmpty()) {
                 PlayerList.add(Player);
-            //}
+            }
         }
+    }
+    public void Nettoyer(){
+        prefsPlayer = getSharedPreferences("PlayerNames", MODE_PRIVATE);
+        prefs = getSharedPreferences("PlayerScore", MODE_PRIVATE);
+        SharedPreferences.Editor editor1 = prefs.edit();
+        SharedPreferences.Editor editor2 = prefsPlayer.edit();
+        editor1.clear();editor2.clear(); editor1.apply();editor2.apply();
     }
 }

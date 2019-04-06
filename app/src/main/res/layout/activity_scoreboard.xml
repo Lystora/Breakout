@@ -10,29 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:id="@+id/activity_score_minus"
+            android:id="@+id/activity_score_addScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-" />
-
-        <Button
-            android:id="@+id/activity_score_plus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+"/>
-
-
-        <TextView
-            android:id="@+id/activity_score_score"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Score = 0"
-            android:textSize="30dp"/>
-        <Button
-            android:id="@+id/activity_score_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Refresh"/>
+            android:text="Add Score"/>
     </LinearLayout>
     <EditText
         android:id="@+id/activity_score_playername"
