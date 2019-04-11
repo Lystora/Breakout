@@ -42,7 +42,7 @@
     </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="350dp"
         android:layout_marginTop="50dp"
         android:layout_gravity="center"
         android:orientation="vertical">
@@ -62,8 +62,20 @@
             android:layout_gravity="center"
             android:textSize="20dp"
              />
-
-
-
+        <EditText
+            android:id="@+id/activity_score_scoreposition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:hint="Score's position"
+            android:layout_gravity="center"/>
+        <Button
+            android:id="@+id/activity_score_removescore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Remove Score"/>
     </LinearLayout>
+
 </LinearLayout>

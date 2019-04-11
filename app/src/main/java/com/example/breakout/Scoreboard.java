@@ -15,9 +15,9 @@ import java.util.Calendar;
 import java.util.List;
 
 public class Scoreboard extends AppCompatActivity {
-    Button AddScoreButton;
+    Button AddScoreButton, RemScoreButton;
     TextView LastScore, ScoreBoard, WinLose;
-    EditText PlayerName;
+    EditText PlayerName, Scoreposition;
     List<String> PlayerList;
     String currentDate;
     SharedPreferences pref, prefs, prefsPlayer, prefsDate;
@@ -41,11 +41,15 @@ public class Scoreboard extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         //Config des Widgets
-        WinLose = (TextView) findViewById(R.id.activity_score_winlose);
+
         AddScoreButton = (Button) findViewById(R.id.activity_score_addScore);
+        RemScoreButton = (Button) findViewById(R.id.activity_score_removescore);
         LastScore = (TextView) findViewById(R.id.activity_score_lastscore);
+        WinLose = (TextView) findViewById(R.id.activity_score_winlose);
         ScoreBoard = (TextView) findViewById(R.id.activity_score_scoreboard);
         PlayerName = (EditText) findViewById(R.id.activity_score_playername);
+        Scoreposition = (EditText) findViewById(R.id.activity_score_scoreposition);
+
         if(getIntent().getBooleanExtra("Lose", false)){
             WinLose.setText("Vous avez perdu...");
         }else{
@@ -73,12 +77,22 @@ public class Scoreboard extends AppCompatActivity {
                     if(PlayerList.size()==5){
                         addPlayer(PlayerName.getText().toString());
                         SortList();
-                        removePlayer();
+                        removeLastPlayer();
                     }else{
                         addPlayer(PlayerName.getText().toString());
                         SortList();
                     }
                 }
+                DisplayScore();
+                SaveList();
+            }
+        });
+        RemScoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String s = Scoreposition.getText().toString();
+                removePlayer(Integer.valueOf(s));
+                SortList();
                 DisplayScore();
                 SaveList();
             }
@@ -123,8 +137,13 @@ public class Scoreboard extends AppCompatActivity {
             taille--;
         }
     }
-    public void removePlayer(){
+    public void removeLastPlayer(){
         PlayerList.remove(PlayerList.size()-1);
+    }
+    public void removePlayer(int i){
+        if(i<PlayerList.size()) {
+            PlayerList.remove(i - 1);
+        }
     }
     public void DisplayScore(){
         String chaine = "";
@@ -134,13 +153,15 @@ public class Scoreboard extends AppCompatActivity {
             if(PlayerList.get(i).isEmpty()){
                 c = "---"+"\n";
             }else{
-                c = PlayerList.get(i)+ "\t - \t"+prefsDate.getString(PlayerList.get(i), "no_date")+"\t - \t"+prefs.getInt(PlayerList.get(i), 0)+"\n";
+                c = PlayerList.get(i)+ "    -   "+prefsDate.getString(PlayerList.get(i), "no_date")+"   -   "+prefs.getInt(PlayerList.get(i), 0)+"\n";
             }
             chaine += c;
         }
         ScoreBoard.setText(chaine);
     }
     public void SaveList(){
+        player_editor.clear();
+        player_editor.apply();
         for(int i=0; i<PlayerList.size(); i++){
             String key ="best"+Integer.toString(i+1);
             player_editor.putString(key, PlayerList.get(i));
