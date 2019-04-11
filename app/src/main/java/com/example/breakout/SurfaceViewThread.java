@@ -126,6 +126,10 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
                     bricks[i].setRes();
                     collisionGaucheDroite(cercle,bricks[i]);
                     score+=1;
+                    if (score==6*8) {
+                        paused = true;
+                        BuildAWall();
+                    }
                 }
             }
         }
@@ -182,7 +186,10 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
             }
         }
         // Restart game
-        if (lives == 0) {
+        if (lives == 0 || score==6*8) {
+            Boolean Lose;
+            if(score==6*8) Lose = false;
+            else Lose = true;
             pref = getContext().getSharedPreferences("PlayerScore", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
             editor.putInt("LatestScore", score);
@@ -190,6 +197,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
             score = 0;
             lives = 3;
             Intent ScoreActivity = new Intent(getContext(), Scoreboard.class);
+            ScoreActivity.putExtra("Lose", Lose);
             getContext().startActivity(ScoreActivity);
         }
     }
