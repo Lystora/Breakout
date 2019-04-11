@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         btScore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Boolean show;
                 show = false;
                 Intent ScoreActivity = new Intent(MainActivity.this, Scoreboard.class);
                 ScoreActivity.putExtra("ShowButton", show);
