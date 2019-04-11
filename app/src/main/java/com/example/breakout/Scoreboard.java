@@ -91,10 +91,12 @@ public class Scoreboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String s = Scoreposition.getText().toString();
-                removePlayer(Integer.valueOf(s));
-                SortList();
-                DisplayScore();
-                SaveList();
+                if(s.charAt(0)>'1' && s.charAt(0)<'9') {
+                    removePlayer(Integer.valueOf(s));
+                    SortList();
+                    DisplayScore();
+                    SaveList();
+                }
             }
         });
 
