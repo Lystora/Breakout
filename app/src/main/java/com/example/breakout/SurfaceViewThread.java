@@ -175,7 +175,7 @@ public class SurfaceViewThread extends SurfaceView implements SurfaceHolder.Call
         brickHeight = screenHeight / 15;
 
         // En cas de reset du jeu
-        cercle.reset(screenWidth, screenHeight);
+        cercle.reset(screenWidth+230, screenHeight-cercle.getRayon());
 
         // Build a wall of bricks
         nbBricks = 0;

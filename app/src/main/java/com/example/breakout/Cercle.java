@@ -42,7 +42,7 @@ public class Cercle{
     public void draw(Canvas c) {
         Paint p = new Paint();
         p.setColor(Color.RED);
-        c.drawCircle(x, y, rayon, p);
+        c.drawCircle(this.x, this.y, this.rayon, p);
     }
     public void reverseYVelocity(){ this.Yspeed = -this.Yspeed;}
     public void reverseXVelocity(){
