@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Scoreboard extends AppCompatActivity {
     Button AddScoreButton, RemScoreButton;
-    TextView LastScore, ScoreBoard, WinLose;
+    TextView LastScore, ScoreBoard, ScoreBoard2, ScoreBoard3, WinLose;
     EditText PlayerName, Scoreposition;
     List<String> PlayerList;
     String currentDate;
@@ -47,6 +47,8 @@ public class Scoreboard extends AppCompatActivity {
         LastScore = (TextView) findViewById(R.id.activity_score_lastscore);
         WinLose = (TextView) findViewById(R.id.activity_score_winlose);
         ScoreBoard = (TextView) findViewById(R.id.activity_score_scoreboard);
+        ScoreBoard2 = (TextView) findViewById(R.id.activity_score_scoreboard2);
+        ScoreBoard3 = (TextView) findViewById(R.id.activity_score_scoreboard3);
         PlayerName = (EditText) findViewById(R.id.activity_score_playername);
         Scoreposition = (EditText) findViewById(R.id.activity_score_scoreposition);
 
@@ -148,18 +150,26 @@ public class Scoreboard extends AppCompatActivity {
         }
     }
     public void DisplayScore(){
-        String chaine = "";
-        String c;
+        String chaine = "",chaine2 = "",chaine3 = "";
+        String c,c2,c3;
         ScoreBoard.setText("");
         for(int i=0; i<PlayerList.size(); i++){
             if(PlayerList.get(i).isEmpty()){
                 c = "---"+"\n";
+                c2 = "---"+"\n";
+                c3 = "---"+"\n";
             }else{
-                c = PlayerList.get(i)+ "    -   "+prefsDate.getString(PlayerList.get(i), "no_date")+"   -   "+prefs.getInt(PlayerList.get(i), 0)+"\n";
+                c = PlayerList.get(i)+"\t\t\t\n";
+                c2 = prefsDate.getString(PlayerList.get(i), "no_date")+"\t\t\t\n";
+                c3 = prefs.getInt(PlayerList.get(i), 0)+"\n";
             }
             chaine += c;
+            chaine2 += c2;
+            chaine3 += c3;
         }
         ScoreBoard.setText(chaine);
+        ScoreBoard2.setText(chaine2);
+        ScoreBoard3.setText(chaine3);
     }
     public void SaveList(){
         player_editor.clear();
