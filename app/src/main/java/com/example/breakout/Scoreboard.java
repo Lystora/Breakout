@@ -91,7 +91,7 @@ public class Scoreboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String s = Scoreposition.getText().toString();
-                if(s.charAt(0)>'1' && s.charAt(0)<'9') {
+                if(s.charAt(0)>='1' && s.charAt(0)<='9') {
                     removePlayer(Integer.valueOf(s));
                     SortList();
                     DisplayScore();
@@ -143,7 +143,7 @@ public class Scoreboard extends AppCompatActivity {
         PlayerList.remove(PlayerList.size()-1);
     }
     public void removePlayer(int i){
-        if(i<PlayerList.size()) {
+        if(i<=PlayerList.size()) {
             PlayerList.remove(i - 1);
         }
     }
